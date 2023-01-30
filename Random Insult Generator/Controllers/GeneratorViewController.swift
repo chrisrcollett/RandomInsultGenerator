@@ -8,10 +8,12 @@
 import AVFoundation
 import UIKit
 
-class GeneratorViewController: UIViewController {
+class GeneratorViewController: UIViewController, AVSpeechSynthesizerDelegate {
 
     @IBOutlet weak var leftPickerView: UIPickerView!
     @IBOutlet weak var rightPickerView: UIPickerView!
+    
+    let synth = AVSpeechSynthesizer()
     
     let leftInsults = Insult(data: prefixInsults)
     let rightInsults = Insult(data: suffixInsults)
@@ -39,20 +41,12 @@ class GeneratorViewController: UIViewController {
     
     @IBAction func insultButtonPressed(_ sender: UIButton) {
         
-        let leftSelectedRow = leftPickerView.selectedRow(inComponent: 0)
-        let rightSelectedRow = rightPickerView.selectedRow(inComponent: 0)
-        let firstInsult = leftInsults.insultArray[leftSelectedRow]
-        let secondInsult = rightInsults.insultArray[rightSelectedRow]
+        let firstInsult = leftInsults.insultArray[leftPickerView.selectedRow(inComponent: 0)]
+        let secondInsult = rightInsults.insultArray[rightPickerView.selectedRow(inComponent: 0)]
         
         let insult = firstInsult + " " + secondInsult
         
-        print(insult)
-        
-        let speaker = AVSpeechUtterance(string: insult)
-        speaker.voice = AVSpeechSynthesisVoice(language: "en-US")
-
-        let synth = AVSpeechSynthesizer()
-        synth.speak(speaker)
+        speech(text: insult)
         
     }
     
@@ -62,6 +56,12 @@ class GeneratorViewController: UIViewController {
         
         leftPickerView.selectRow(Int.random(in: 1...leftInsultCount), inComponent: 0, animated: true)
         rightPickerView.selectRow(Int.random(in: 1...rightInsultCount), inComponent: 0, animated: true)
+    }
+    
+    func speech(text: String) {
+        let speaker = AVSpeechUtterance(string: text)
+        speaker.voice = AVSpeechSynthesisVoice(language: "en-US")
+        synth.speak(speaker)
     }
     
     
